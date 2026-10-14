@@ -1,0 +1,16 @@
+{
+  "name": "TITAN 授权签发",
+  "short_name": "授权签发",
+  "description": "TITAN巨人AI 供应商内部授权签发工具（离线）",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#04121a",
+  "theme_color": "#04121a",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
