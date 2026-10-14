@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#04121a" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>TITAN · 授权签发</title>
+<style>
+:root{
+  --bg:#04121a; --panel:#081d29; --panel2:#0b2433; --line:#163244;
+  --cyan:#00e5ee; --cyan2:#19b6c9; --orange:#ff8a1e; --green:#27e0a0; --red:#ff5a6e;
+  --txt:#dff3f8; --mut:#7fa6b4;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+body{display:flex;justify-content:center;}
+.app{width:100%;max-width:480px;min-height:100%;display:flex;flex-direction:column;
+  padding:max(env(safe-area-inset-top),16px) 16px calc(env(safe-area-inset-bottom) + 16px);}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#0a3542,#02151d);
+  border:1px solid #1d5a68;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(0,229,238,.25);}
+.logo svg{width:20px;height:20px;}
+.brand h1{font-size:17px;margin:0;letter-spacing:.5px;}
+.brand .sub{font-size:11px;color:var(--mut);margin-top:1px;}
+.iconbtn{background:var(--panel);border:1px solid var(--line);border-radius:10px;width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;color:var(--cyan);cursor:pointer;}
+.iconbtn:active{transform:scale(.94);}
+.card{background:linear-gradient(180deg,var(--panel),#071822);border:1px solid var(--line);
+  border-radius:16px;padding:16px;margin-bottom:14px;}
+label.fld{display:block;font-size:12px;color:var(--mut);margin:12px 0 7px;letter-spacing:.5px;}
+label.fld:first-child{margin-top:0;}
+input[type=text],input[type=password],input[type=date]{width:100%;background:#05141c;
+  border:1px solid var(--line);border-radius:11px;color:var(--txt);font-size:15px;padding:13px 13px;outline:none;}
+input:focus{border-color:var(--cyan2);box-shadow:0 0 0 3px rgba(0,229,238,.12);}
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{flex:1 1 auto;min-width:64px;text-align:center;background:#05141c;border:1px solid var(--line);
+  border-radius:10px;padding:10px 6px;font-size:13px;color:var(--txt);cursor:pointer;user-select:none;}
+.chip.on{background:rgba(0,229,238,.14);border-color:var(--cyan);color:#bdf9fc;box-shadow:0 0 0 1px rgba(0,229,238,.25);}
+.chip:active{transform:scale(.95);}
+#customRow{display:none;margin-top:10px;}
+.btn{width:100%;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;
+  background:linear-gradient(135deg,#00e5ee,#0fb6c4);color:#03222b;box-shadow:0 8px 22px rgba(0,229,238,.25);}
+.btn:active{transform:scale(.98);}
+.btn.ghost{background:#0a2029;color:var(--cyan);border:1px solid #1d5663;box-shadow:none;}
+.btn.orange{background:linear-gradient(135deg,#ff9a36,#ff7a10);color:#2b1300;box-shadow:0 8px 22px rgba(255,138,30,.25);}
+.out{background:#041016;border:1px dashed #235a68;border-radius:12px;padding:13px;font-size:14px;
+  word-break:break-all;line-height:1.55;color:#bff4f8;min-height:52px;font-family:ui-monospace,Menlo,Consolas,monospace;}
+.row2{display:flex;gap:10px;margin-top:10px;}
+.row2 .btn{padding:12px;font-size:14px;}
+.msg{font-size:12px;margin-top:10px;min-height:16px;}
+.msg.ok{color:var(--green);} .msg.err{color:var(--red);} .msg.warn{color:var(--orange);}
+.hist{font-size:13px;}
+.hist .item{padding:10px 0;border-bottom:1px solid #0e2a38;}
+.hist .item:last-child{border-bottom:none;}
+.hist .top{display:flex;justify-content:space-between;gap:8px;align-items:center;}
+.hist .tag{font-size:11px;padding:2px 8px;border-radius:7px;}
+.tag.long{background:rgba(39,224,160,.14);color:var(--green);}
+.tag.timed{background:rgba(255,138,30,.14);color:var(--orange);}
+.hist .mc{color:var(--mut);font-size:12px;margin-top:3px;}
+.hist .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:#9fd7e0;
+  margin-top:5px;word-break:break-all;}
+.empty{color:var(--mut);text-align:center;padding:18px 0;font-size:13px;}
+.lock{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.lock .badge{width:64px;height:64px;border-radius:16px;margin:0 auto 18px;display:flex;
+  align-items:center;justify-content:center;background:linear-gradient(135deg,#0a3542,#02151d);
+  border:1px solid #1d5a68;box-shadow:0 0 30px rgba(0,229,238,.3);}
+.lock h2{text-align:center;font-size:18px;margin:0 0 6px;}
+.lock p{text-align:center;color:var(--mut);font-size:13px;margin:0 0 22px;}
+.hidden{display:none !important;}
+.foot{margin-top:auto;text-align:center;color:#4d7482;font-size:11px;padding-top:8px;}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut);
+  background:#0a2029;border:1px solid #16323f;border-radius:99px;padding:5px 11px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ========== 锁屏 ========== -->
+  <section id="screenLock" class="lock">
+    <div class="badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#00e5ee" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <h2>供应商授权签发</h2>
+    <p>请输入解锁口令，私钥仅在本次会话解密，全程离线</p>
+    <div class="card">
+      <input id="lockPwd" type="password" placeholder="解锁口令" autocomplete="off" />
+      <div style="height:12px"></div>
+      <button id="lockBtn" class="btn">解锁</button>
+      <div id="lockMsg" class="msg err"></div>
+    </div>
+    <div class="foot">内部工具 · 一机一码 · 严禁外泄</div>
+  </section>
+
+  <!-- ========== 主界面 ========== -->
+  <section id="screenMain" class="hidden">
+    <div class="hdr">
+      <div class="brand">
+        <div class="logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00e5ee" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l7 4v6c0 4.5-3 7.5-7 10-4-2.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div><h1>授权签发</h1><div class="sub"><span class="pill"><span class="dot"></span> 离线 · 已解锁</span></div></div>
+      </div>
+      <button id="btnHist" class="iconbtn" title="记录">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="card">
+      <label class="fld">客户机器码（客户在客户端「设置 → 机器码」获取）</label>
+      <input id="machine" type="text" placeholder="JX-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" />
+
+      <label class="fld">客户备注（可选，如：张三 / 订单号）</label>
+      <input id="customer" type="text" placeholder="备注" autocomplete="off" />
+
+      <label class="fld">授权类型</label>
+      <div class="chips" id="planChips">
+        <div class="chip on" data-plan="permanent">永久</div>
+        <div class="chip" data-days="7">7天</div>
+        <div class="chip" data-days="30">30天</div>
+        <div class="chip" data-days="90">90天</div>
+        <div class="chip" data-days="180">180天</div>
+        <div class="chip" data-days="365">365天</div>
+        <div class="chip" data-plan="custom">自定义</div>
+      </div>
+      <div id="customRow"><input id="customDate" type="date" /></div>
+
+      <div style="height:14px"></div>
+      <button id="genBtn" class="btn">生成注册码</button>
+    </div>
+
+    <div class="card">
+      <label class="fld">注册码（发给客户，客户端粘贴即可激活）</label>
+      <div id="out" class="out">等待生成…</div>
+      <div class="row2">
+        <button id="copyBtn" class="btn ghost">复制</button>
+        <button id="lockOut" class="btn ghost">锁定</button>
+      </div>
+      <div id="genMsg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <label class="fld" style="margin:0">签发记录（本机保存）</label>
+        <button id="btnPwd" class="iconbtn" style="width:34px;height:34px" title="改口令">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+          </svg>
+        </button>
+      </div>
+      <div id="histBox" class="hist" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <!-- ========== 历史全屏 ========== -->
+  <section id="screenHist" class="hidden">
+    <div class="hdr">
+      <div class="brand"><h1>签发记录</h1></div>
+      <button id="histBack" class="iconbtn">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+    </div>
+    <div class="card"><div id="histFull" class="hist"></div></div>
+  </section>
+
+  <!-- ========== 改口令 ========== -->
+  <section id="screenPwd" class="hidden">
+    <div class="hdr">
+      <div class="brand"><h1>修改解锁口令</h1></div>
+      <button id="pwdBack" class="iconbtn">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+    </div>
+    <div class="card">
+      <label class="fld">新口令</label>
+      <input id="newPwd1" type="password" placeholder="至少 6 位" autocomplete="off" />
+      <label class="fld">再次输入</label>
+      <input id="newPwd2" type="password" placeholder="确认新口令" autocomplete="off" />
+      <div style="height:14px"></div>
+      <button id="pwdSave" class="btn orange">保存并重新加密</button>
+      <div id="pwdMsg" class="msg"></div>
+    </div>
+    <div class="card" style="font-size:12px;color:var(--mut);line-height:1.7">
+      保存后私钥将用新口令重新加密（PBKDF2 25 万次 + AES-GCM），并写入本机；
+      口令忘记无法找回，请妥善记录。
+    </div>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+/* ================= 常量（与桌面签发器/客户端完全一致） ================= */
+const PRODUCT_CODE = "JINXI";
+const FIELD_ORDER = ["product","machine","plan","expire","customer","issue"];
+const SEAL_TEXT = "JINXI::license::seal::v1";
+const PBKDF_ITER = 250000;
+// 私钥锁（base64: salt16 + iv12 + ct），初始口令见交付说明，首次解锁后请在“改口令”中更换
+const EMBEDDED_LOCK = "DEUHsG6bXC8jB5Dzs+xA7PkTX31hu23tjBpEBv72uKONfMS7/Vr7DS/Hr75j2pYKPsCQXXJWZgc+raWR42sbxT6ZySrBlf6WEYE1fQ==";
+const LS_LOCK = "titan_mkey_lock_v1", LS_HIST = "titan_mkey_hist_v1";
+
+const enc = new TextEncoder(), dec = new TextDecoder();
+const $ = (id) => document.getElementById(id);
+let privRaw = null;          // 32 字节私钥
+let edKey = null;            // Ed25519 CryptoKey
+let codeKey = null;          // 载荷 AES-GCM CryptoKey
+let selPlan = {mode:"permanent"};
+
+/* ================= 字节/Base64 工具 ================= */
+function b64StdToBytes(b64){
+  const bin = atob(b64.trim()); const u = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u;
+}
+function bytesToB64Url(u){
+  let bin=""; const CH=0x8000;
+  for(let i=0;i<u.length;i+=CH){ bin += String.fromCharCode.apply(null, u.subarray(i,i+CH)); }
+  return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function randomBytes(n){ const u=new Uint8Array(n); crypto.getRandomValues(u); return u; }
+function concatBytes(arrs){
+  let n=0; for(const a of arrs) n+=a.length;
+  const out=new Uint8Array(n); let o=0;
+  for(const a of arrs){ out.set(a,o); o+=a.length; } return out;
+}
+
+/* ================= 私钥锁：PBKDF2 + AES-GCM ================= */
+async function deriveKEK(password, salt){
+  const baseKey = await crypto.subtle.importKey("raw", enc.encode(password),
+    {name:"PBKDF2"}, false, ["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    {name:"PBKDF2", salt, iterations:PBKDF_ITER, hash:"SHA-256"},
+    baseKey, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+}
+async function unlockPrivate(password){
+  const raw = b64StdToBytes(getLockBlob());
+  const salt=raw.slice(0,16), iv=raw.slice(16,28), ct=raw.slice(28);
+  const kek = await deriveKEK(password, salt);
+  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv, additionalData:enc.encode("JINXI-lock")}, kek, ct);
+  return new Uint8Array(pt);
+}
+async function lockPrivate(password, keyBytes){
+  const salt=randomBytes(16), iv=randomBytes(12);
+  const kek = await deriveKEK(password, salt);
+  const ct = await crypto.subtle.encrypt({name:"AES-GCM", iv, additionalData:enc.encode("JINXI-lock")},
+    kek, keyBytes);
+  const blob = bytesToB64Url(concatBytes([salt,iv,new Uint8Array(ct)]));
+  // 统一用标准 base64 存储（解锁时 atob）
+  return btoa(String.fromCharCode.apply(null, concatBytes([salt,iv,new Uint8Array(ct)])));
+}
+function getLockBlob(){ return localStorage.getItem(LS_LOCK) || EMBEDDED_LOCK; }
+
+/* ================= 注册码生成（与桌面 sign() 完全一致） ================= */
+async function buildCodeKey(){
+  const digest = await crypto.subtle.digest("SHA-256", enc.encode(SEAL_TEXT));
+  return crypto.subtle.importKey("raw", digest, {name:"AES-GCM"}, false, ["encrypt"]);
+}
+function isoDate(d){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function endOfDay(d){ return new Date(d.getFullYear(),d.getMonth(),d.getDate(),23,59,59,0); }
+function expireForPlan(){
+  if(selPlan.mode==="permanent") return {plan:"permanent", expire:0};
+  const d=new Date();
+  if(selPlan.mode==="days"){ d.setDate(d.getDate()+selPlan.days); }
+  else { // custom
+    const v=$("customDate").value;
+    if(!v) throw new Error("请选择自定义截止日期");
+    const [y,m,dd]=v.split("-").map(Number);
+    return {plan:"timed", expire:Math.floor(new Date(y,m-1,dd,23,59,59).getTime()/1000)};
+  }
+  return {plan:"timed", expire:Math.floor(endOfDay(d).getTime()/1000)};
+}
+async function generate(){
+  const machine = $("machine").value.trim().toUpperCase().replace(/\s+/g,"");
+  const customer = $("customer").value.trim();
+  if(!machine.startsWith("JX-")) throw new Error("机器码应以 JX- 开头");
+  const {plan,expire} = expireForPlan();
+  const payload = {product:PRODUCT_CODE, machine, plan, expire, customer, issue:isoDate(new Date())};
+  const canon = FIELD_ORDER.map(k => String(payload[k])).join("|");
+  // Ed25519 签名
+  const sig = new Uint8Array(await crypto.subtle.sign({name:"Ed25519"}, edKey, enc.encode(canon)));
+  // 载荷 AES-GCM
+  const nonce = randomBytes(12);
+  const plain = enc.encode(JSON.stringify(payload));
+  const ct = new Uint8Array(await crypto.subtle.encrypt(
+    {name:"AES-GCM", iv:nonce, additionalData:enc.encode(PRODUCT_CODE)}, codeKey, plain));
+  const body = bytesToB64Url(concatBytes([nonce,ct]));
+  const code = "E" + body + "." + bytesToB64Url(sig);
+  return {code, machine, plan, expire, customer};
+}
+
+/* ================= 历史记录 ================= */
+function loadHist(){
+  try{ return JSON.parse(localStorage.getItem(LS_HIST)||"[]"); }catch(e){ return []; }
+}
+function saveHist(h){ localStorage.setItem(LS_HIST, JSON.stringify(h.slice(0,100))); }
+function addHist(rec){
+  const h=loadHist(); h.unshift({...rec, t:Math.floor(Date.now()/1000)}); saveHist(h);
+}
+function fmtTime(t){
+  const d=new Date(t*1000);
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+function planLabel(rec){
+  if(rec.plan==="permanent") return "永久";
+  const d=new Date(rec.expire*1000); return "至 "+isoDate(d);
+}
+function histItemHTML(r){
+  const tag = r.plan==="permanent" ? '<span class="tag long">永久</span>'
+      : `<span class="tag timed">${planLabel(r)}</span>`;
+  return `<div class="item">
+    <div class="top"><b>${r.customer||"未备注"}</b>${tag}<span style="color:#7fa6b4;font-size:11px">${fmtTime(r.t)}</span></div>
+    <div class="mc">${r.machine}</div>
+    <div class="code">${r.code}</div>
+  </div>`;
+}
+function renderHist(){
+  const h=loadHist();
+  if(!h.length){ $("histBox").innerHTML='<div class="empty">暂无签发记录</div>';
+    $("histFull").innerHTML='<div class="empty">暂无签发记录</div>'; return; }
+  $("histBox").innerHTML = h.slice(0,5).map(histItemHTML).join("");
+  $("histFull").innerHTML = h.map(histItemHTML).join("");
+}
+
+/* ================= 页面切换 ================= */
+function show(name){
+  ["screenLock","screenMain","screenHist","screenPwd"].forEach(s=>$(s).classList.add("hidden"));
+  $(name).classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+
+/* ================= 初始化与事件 ================= */
+function checkSupport(){
+  const ok = !!(window.crypto && crypto.subtle && crypto.subtle.sign);
+  return ok;
+}
+function ed25519Pkcs8(priv32){
+  // PKCS#8 PrivateKeyInfo for Ed25519 (OID 1.3.101.112)，仅包 32 字节私钥
+  const head = new Uint8Array([0x30,0x2e,0x02,0x01,0x00,0x30,0x05,0x06,0x03,
+    0x2b,0x65,0x70,0x04,0x22,0x04,0x20]);
+  return concatBytes([head,priv32]);
+}
+async function afterUnlock(){
+  // 导入 Ed25519 私钥：Web Crypto 不支持 raw 导入私钥，须用 pkcs8
+  edKey = await crypto.subtle.importKey("pkcs8", ed25519Pkcs8(privRaw),
+    {name:"Ed25519"}, false, ["sign"]);
+  codeKey = await buildCodeKey();
+  renderHist(); show("screenMain");
+}
+
+$("lockBtn").addEventListener("click", async ()=>{
+  const m=$("lockMsg"); m.className="msg err"; m.textContent="";
+  try{
+    const pwd=$("lockPwd").value;
+    if(!pwd) throw new Error("请输入解锁口令");
+    privRaw = await unlockPrivate(pwd);
+    if(privRaw.length!==32) throw new Error("私钥长度异常");
+    await afterUnlock();
+  }catch(e){ m.textContent = "口令错误或数据损坏（"+e.message+"）"; }
+});
+$("lockPwd").addEventListener("keydown",e=>{ if(e.key==="Enter") $("lockBtn").click(); });
+
+document.querySelectorAll("#planChips .chip").forEach(c=>{
+  c.addEventListener("click",()=>{
+    document.querySelectorAll("#planChips .chip").forEach(x=>x.classList.remove("on"));
+    c.classList.add("on");
+    if(c.dataset.plan==="permanent"){ selPlan={mode:"permanent"}; $("customRow").style.display="none"; }
+    else if(c.dataset.plan==="custom"){ selPlan={mode:"custom"}; $("customRow").style.display="block"; }
+    else { selPlan={mode:"days",days:Number(c.dataset.days)}; $("customRow").style.display="none"; }
+  });
+});
+
+$("genBtn").addEventListener("click", async ()=>{
+  const m=$("genMsg"); m.className="msg"; m.textContent="";
+  try{
+    const r = await generate();
+    $("out").textContent = r.code;
+    addHist(r); renderHist();
+    m.className="msg ok"; m.textContent="已生成，可复制发给客户";
+  }catch(e){ m.className="msg err"; m.textContent="生成失败："+e.message; }
+});
+$("copyBtn").addEventListener("click", async ()=>{
+  const txt=$("out").textContent;
+  const m=$("genMsg");
+  if(!txt || txt==="等待生成…"){ m.className="msg err"; m.textContent="还没有注册码"; return; }
+  try{ await navigator.clipboard.writeText(txt); m.className="msg ok"; m.textContent="已复制到剪贴板"; }
+  catch(e){
+    const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta);
+    ta.select(); try{document.execCommand("copy"); m.className="msg ok"; m.textContent="已复制";}
+    catch(_){ m.className="msg err"; m.textContent="复制失败，请手动长按选择"; }
+    ta.remove();
+  }
+});
+$("lockOut").addEventListener("click", ()=>{
+  privRaw=null; edKey=null; codeKey=null; $("lockPwd").value="";
+  $("out").textContent="等待生成…"; show("screenLock");
+});
+
+$("btnHist").addEventListener("click",()=>show("screenHist"));
+$("histBack").addEventListener("click",()=>show("screenMain"));
+$("btnPwd").addEventListener("click",()=>show("screenPwd"));
+$("pwdBack").addEventListener("click",()=>show("screenMain"));
+$("pwdSave").addEventListener("click", async ()=>{
+  const m=$("pwdMsg"); m.className="msg"; m.textContent="";
+  const p1=$("newPwd1").value, p2=$("newPwd2").value;
+  if(p1.length<6){ m.className="msg err"; m.textContent="口令至少 6 位"; return; }
+  if(p1!==p2){ m.className="msg err"; m.textContent="两次输入不一致"; return; }
+  try{
+    const stdB64 = await lockPrivate(p1, privRaw);
+    localStorage.setItem(LS_LOCK, stdB64);
+    $("newPwd1").value=""; $("newPwd2").value="";
+    m.className="msg ok"; m.textContent="已保存，新口令即时生效";
+  }catch(e){ m.className="msg err"; m.textContent="保存失败："+e.message; }
+});
+
+// 启动
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+if(!checkSupport()){
+  $("lockMsg").className="msg err";
+  $("lockMsg").textContent="当前浏览器不支持所需加密能力，请更新浏览器（建议最新 Chrome / Safari）";
+}
+</script>
+</body>
+</html>
