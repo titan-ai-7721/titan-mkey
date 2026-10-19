@@ -1,5 +1,5 @@
 /* TITAN 授权签发 · 离线 Service Worker */
-const CACHE = "titan-mkey-v1";
+const CACHE = "titan-mkey-v2";
 const ASSETS = [
   "./",
   "./index.html",
